@@ -19,12 +19,12 @@ const server = app.listen(8000, () => {
 const io = socket(server);
 
 io.on('connection', (socket) => {
-  console.log('New client! Its id – ' + socket.id);
+  console.log('I\'ve added a listener on message event \n');
 
   socket.on('user', (user) => {
     users.push({ user: user.author, userId: socket.id })
     console.log('Oh, I\'ve got new user', users)
-    socket.broadcast.emit('message', { author: 'Chat Bot', content: `${user.author} has joined the conversation` });
+    socket.broadcast.emit('message', { author: 'Chat Bot', content: user.author + ` has joined the conversation` });
   })
   console.log('New client! Its id – ' + socket.id);
   socket.on('message', (message) => {
@@ -32,12 +32,16 @@ io.on('connection', (socket) => {
     messages.push(message);
     socket.broadcast.emit('message', message);
   });
+
   socket.on('disconnect', () => {
-    console.log('Oh, socket ' + socket.id + ' has left');
+    const disconnectedUser = users.find((user) => user.userId === socket.id);
+    if (disconnectedUser) {
+      socket.broadcast.emit('message', { author: 'Chat Bot', content: disconnectedUser.user + ' has left the conversation' });
+      console.log('Oh, socket ' + socket.id + ' has left');
+    }
   });
-  console.log("I've added a listener on message and disconnect events \n");
 });
 
 app.use((req, res) => {
   res.status(404).json({ message: 'not found' });
-});
+})

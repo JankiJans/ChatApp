@@ -16,6 +16,7 @@ loginForm.addEventListener('submit', function login(event) {
       userName = userNameInput.value;
       loginForm.classList.remove('show');
       messagesSection.classList.add('show');
+      socket.emit('user', { author: userName })
       console.log('logged in as:', userName);
   
       // Usuwanie istniejących wiadomości z listy
@@ -45,7 +46,7 @@ function addMessage(author, content) {
   message.classList.add('message--received');
   if (author === userName) {
     message.classList.add('message--self');
-  } else if (author === 'ChatBot') {
+  } else if (author === 'Chat Bot') {
     message.classList.add('message--bot')  
   }
   message.innerHTML = `
